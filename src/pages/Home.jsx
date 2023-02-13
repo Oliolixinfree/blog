@@ -27,6 +27,13 @@ export const Home = () => {
     return <Spinner />;
   }
 
+  const excerpt = (str, count) => {
+    if (str.length > count) {
+      str = str.substring(0, count) + ' ...';
+    }
+    return str;
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure to delete?')) {
       await deleteBlog(id);
@@ -49,7 +56,7 @@ export const Home = () => {
               <MDBCardImage src={item.imgURL} alt={item.title} position="top" />
               <MDBCardBody>
                 <MDBCardTitle>{item.title}</MDBCardTitle>
-                <MDBCardText>{item.description}</MDBCardText>
+                <MDBCardText>{excerpt(item.description, 80)}</MDBCardText>
                 <div style={{ marginLeft: '5px', float: 'right' }}>
                   <MDBBtn className="mt-1" tag="a" color="none">
                     <MDBIcon
