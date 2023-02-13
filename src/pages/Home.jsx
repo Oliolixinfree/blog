@@ -13,10 +13,11 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Spinner } from '../components/Spinner';
-import { useFetchBlogsQuery } from '../services/blogsApi';
+import { useDeleteBlogMutation, useFetchBlogsQuery } from '../services/blogsApi';
 
 export const Home = () => {
   const { data, isLoading, isError, error } = useFetchBlogsQuery();
+  const [deleteBlog] = useDeleteBlogMutation();
 
   useEffect(() => {
     isError && toast.error(error);
@@ -26,7 +27,12 @@ export const Home = () => {
     return <Spinner />;
   }
 
-  const handleDelete = () => {};
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure to delete?')) {
+      await deleteBlog(id);
+      toast.success('Blog deleted successfully');
+    }
+  };
 
   return (
     <div
