@@ -12,7 +12,6 @@ import { storage } from '../firebase-config';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
 import { useAddBlogMutation } from '../services/blogsApi';
-import { async } from '@firebase/util';
 import { useNavigate } from 'react-router-dom';
 
 const initialState = {
@@ -32,7 +31,7 @@ export const AddEditBlog = () => {
 
   useEffect(() => {
     const uploadFile = () => {
-      const name = new Date().getTime() + file.name;
+      // const name = new Date().getTime() + file.name;
       const storageRef = ref(storage, file.name);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -60,7 +59,7 @@ export const AddEditBlog = () => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             toast.info('Image upload successfully');
-            setData((prev) => ({ ...prev, imdURL: downloadURL }));
+            setData((prev) => ({ ...prev, imgURL: downloadURL }));
           });
         },
       );
