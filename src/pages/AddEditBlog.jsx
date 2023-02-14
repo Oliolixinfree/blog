@@ -11,8 +11,9 @@ import React, { useEffect, useState } from 'react';
 import { storage } from '../firebase-config';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
-import { useAddBlogMutation } from '../services/blogsApi';
-import { useNavigate } from 'react-router-dom';
+import { useAddBlogMutation, useFetchBlogQuery, useUpdateBlogMutation } from '../services/blogsApi';
+import { useNavigate, useParams } from 'react-router-dom';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
 
 const initialState = {
   title: '',
@@ -24,10 +25,19 @@ export const AddEditBlog = () => {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(null);
   const [addBlog] = useAddBlogMutation();
+  const { id } = useParams();
+  const { data: blog } = useFetchBlogQuery(id ? id : skipToken);
+  const [updateBlog] = useUpdateBlogMutation();
 
   const navigate = useNavigate();
 
   const { title, description } = data;
+
+  useEffect(() => {
+    if (id && blog) {
+      setData({ ...blog });
+    }
+  }, [id, blog]);
 
   useEffect(() => {
     const uploadFile = () => {
@@ -75,8 +85,15 @@ export const AddEditBlog = () => {
     e.preventDefault();
 
     if (title && description) {
-      await addBlog(data);
-      navigate('/');
+      if (!id) {
+        await addBlog(data);
+        toast.success('Blog Added Successfully');
+        navigate('/');
+      } else {
+        await updateBlog({ id, data });
+        toast.success('Blog Updated Successfully');
+        navigate('/');
+      }
     }
   };
 
@@ -92,7 +109,7 @@ export const AddEditBlog = () => {
       className="container">
       <MDBCard alignment="center">
         <h4 className="fw-bold" style={{ marginTop: '1.5rem' }}>
-          Create Blog
+          {id ? 'Update Blog' : 'Create Blog'}
         </h4>
         <MDBCardBody>
           <MDBValidation className="row g-3" noValidate onSubmit={handleSubmit}>
@@ -124,7 +141,7 @@ export const AddEditBlog = () => {
             </div>
             <div className="col-12">
               <MDBBtn style={{ width: '100%' }} disabled={progress !== null && progress < 100}>
-                Submit
+                {id ? 'Update' : 'Submit'}
               </MDBBtn>
             </div>
           </MDBValidation>

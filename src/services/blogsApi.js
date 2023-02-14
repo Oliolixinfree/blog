@@ -1,5 +1,14 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
-import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore';
 import { db } from '../firebase-config';
 
 export const blogsApi = createApi({
@@ -27,6 +36,20 @@ export const blogsApi = createApi({
       },
       providesTags: ['Blog'],
     }),
+
+    fetchBlog: builder.query({
+      async queryFn(id) {
+        try {
+          const docRef = doc(db, 'blogs', id);
+          const snapshot = await getDoc(docRef);
+          return { data: snapshot.data() };
+        } catch (err) {
+          return { error: err };
+        }
+      },
+      providesTags: ['Blog'],
+    }),
+
     addBlog: builder.mutation({
       async queryFn(data) {
         try {
@@ -42,6 +65,7 @@ export const blogsApi = createApi({
       },
       invalidatesTags: ['Blog'],
     }),
+
     deleteBlog: builder.mutation({
       async queryFn(id) {
         try {
@@ -54,7 +78,29 @@ export const blogsApi = createApi({
       },
       invalidatesTags: ['Blog'],
     }),
+
+    updateBlog: builder.mutation({
+      async queryFn({ id, data }) {
+        try {
+          await updateDoc(doc(db, 'blogs', id), {
+            ...data,
+            timestamp: serverTimestamp(),
+          });
+
+          return { data: 'ok' };
+        } catch (err) {
+          return { error: err };
+        }
+      },
+      invalidatesTags: ['Blog'],
+    }),
   }),
 });
 
-export const { useFetchBlogsQuery, useAddBlogMutation, useDeleteBlogMutation } = blogsApi;
+export const {
+  useFetchBlogsQuery,
+  useAddBlogMutation,
+  useDeleteBlogMutation,
+  useFetchBlogQuery,
+  useUpdateBlogMutation,
+} = blogsApi;

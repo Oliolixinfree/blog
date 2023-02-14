@@ -29,7 +29,7 @@ export const Home = () => {
 
   const excerpt = (str, count) => {
     if (str.length > count) {
-      str = str.substring(0, count) + ' ...';
+      str = str.substring(0, count) + ' ... ';
     }
     return str;
   };
@@ -56,7 +56,11 @@ export const Home = () => {
               <MDBCardImage src={item.imgURL} alt={item.title} position="top" />
               <MDBCardBody>
                 <MDBCardTitle>{item.title}</MDBCardTitle>
-                <MDBCardText>{excerpt(item.description, 80)}</MDBCardText>
+                <MDBCardText>
+                  {excerpt(item.description, 80)}
+                  <Link to={`/detail/${item.id}`}>Read More</Link>
+                </MDBCardText>
+
                 <div style={{ marginLeft: '5px', float: 'right' }}>
                   <MDBBtn className="mt-1" tag="a" color="none">
                     <MDBIcon
